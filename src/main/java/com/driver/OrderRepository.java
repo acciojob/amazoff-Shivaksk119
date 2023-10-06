@@ -24,6 +24,9 @@ public class OrderRepository {
     }
 
     public void addOrderToDelPartnerInDb(String orderId, String partnerId) {
+        if(OrdersDb.get(orderId).isDriverAssigned()) {
+            return;
+        }
         if(DeliveryPartnerDb.containsKey(partnerId) && OrdersDb.containsKey(orderId)) {
 
             //adding to Deliver Partner
@@ -32,6 +35,7 @@ public class OrderRepository {
 
             DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
             currDelPartner.setAssignedOrdersList(currOrderList);
+            currDelPartner.setOrderAssigned(true);
 
             DeliveryPartnerDb.put(partnerId,currDelPartner);
 
@@ -69,8 +73,6 @@ public class OrderRepository {
 
             ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
 
-            DeliveryPartnerDb.remove(partnerId); //removing to Deliver Partner
-
             //removing to orderId
             for(String orderId:currOrderList) {
                 Order currOrder = OrdersDb.get(orderId);
@@ -78,6 +80,8 @@ public class OrderRepository {
                 currOrder.setAssignedDeliveryPartner("");
                 OrdersDb.put(orderId, currOrder);
             }
+
+            DeliveryPartnerDb.remove(partnerId); //removing to Deliver Partner
         }
     }
 
@@ -91,10 +95,10 @@ public class OrderRepository {
 
             if(DeliveryPartnerDb.containsKey(partnerId)) {
                 DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
-
                 ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
-
                 currOrderList.remove(orderId);
+                currDelPartner.setAssignedOrdersList(currOrderList);
+                DeliveryPartnerDb.put(partnerId, currDelPartner);
             }
             OrdersDb.remove(orderId);
         }

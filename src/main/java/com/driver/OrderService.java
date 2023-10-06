@@ -94,7 +94,20 @@ public class OrderService {
         int HH = MaxTime/60;
         int MM = MaxTime%60;
 
-        return HH+":"+MM;
+        String Hr  = "";
+        String Min = "";
+
+        if(HH<10) {
+            Hr += "0";
+        }
+        Hr += HH;
+
+        if(MM<10) {
+            Min += "0";
+        }
+        Min += MM;
+
+        return Hr+":"+Min;
     }
 
     public void removePartnerId(String partnerId) {
