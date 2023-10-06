@@ -109,7 +109,7 @@ public class OrderController {
 
         Integer countOfOrders = 0;
 
-        countOfOrders = serviceLayer.getCountOfUndeliveredOrders(time, partnerId);
+        countOfOrders = serviceLayer.(time, partnerId);
 
         //countOfOrders that are left after a particular time of a DeliveryPartner
 

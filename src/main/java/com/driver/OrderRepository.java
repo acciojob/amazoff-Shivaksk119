@@ -10,7 +10,8 @@ public class OrderRepository {
 
     HashMap<String, Order> OrdersDb = new HashMap<>();
     HashMap<String, DeliveryPartner> DeliveryPartnerDb = new HashMap<>();
-
+    HashMap<String, String> OrderToPartnerPair = new HashMap<>();
+    HashMap<String, ArrayList<String>> PartnerToOrderPair = new HashMap<>();
 
     public OrderRepository() {//Constructor
     }
@@ -21,31 +22,21 @@ public class OrderRepository {
 
     public void addDelvPartnerToDb(String partnerId) {
         DeliveryPartner newDeliveryPartner = new DeliveryPartner(partnerId);
-        DeliveryPartnerDb.put(partnerId, newDeliveryPartner);
+        DeliveryPartnerDb.put(newDeliveryPartner.getId(), newDeliveryPartner);
     }
 
     public void addOrderToDelPartnerInDb(String orderId, String partnerId) {
-        if(OrdersDb.get(orderId).isDriverAssigned()) {
+        if(OrderToPartnerPair.containsKey(orderId)) {
             return;
         }
-        //if(DeliveryPartnerDb.containsKey(partnerId) && OrdersDb.containsKey(orderId)) {
+        ArrayList<String> OrderList = PartnerToOrderPair.getOrDefault(partnerId, new ArrayList<>());
+        OrderList.add(orderId);
 
-        //adding order to Deliver Partner
-        DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
-        ArrayList<String> currOrderList = currDelPartner.getAssignedOrdersList();
-        currOrderList.add(orderId);
-
-        currDelPartner.setAssignedOrdersList(currOrderList);
-        currDelPartner.setOrderAssigned(true);
-
-        DeliveryPartnerDb.put(partnerId,currDelPartner);
-
-        //adding partner to orderId
-        Order currOrder = OrdersDb.get(orderId);
-        currOrder.setDriverAssigned(true);
-        currOrder.setAssignedDeliveryPartner(partnerId);
-
-        OrdersDb.put(orderId, currOrder);
+        PartnerToOrderPair.put(partnerId, OrderList);
+        OrderToPartnerPair.put(orderId, partnerId);
+        DeliveryPartner CurrpPartner = DeliveryPartnerDb.get(partnerId);
+        CurrpPartner.setNumberOfOrders(OrderList.size());
+        DeliveryPartnerDb.put(partnerId, CurrpPartner);
     }
 
     public Order getOrderFromDb(String orderId) {
@@ -53,7 +44,10 @@ public class OrderRepository {
     }
 
     public DeliveryPartner getDelPartnerFromDb(String partnerId) {
-        return DeliveryPartnerDb.getOrDefault(partnerId, null);
+        if(DeliveryPartnerDb.containsKey(partnerId)) {
+            return DeliveryPartnerDb.get(partnerId);
+        }
+        return null;
     }
 
     public List<String> getListOfAllOrdersFromDb() {
@@ -66,51 +60,37 @@ public class OrderRepository {
     }
 
     public void removePartnerIdFromDb(String partnerId) {
-        if(DeliveryPartnerDb.containsKey(partnerId)) {
-
-            ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
-
-            //removing to orderId
-            for(String orderId:currOrderList) {
-                Order currOrder = OrdersDb.get(orderId);
-                currOrder.setDriverAssigned(false);
-                currOrder.setAssignedDeliveryPartner("");
-                OrdersDb.put(orderId, currOrder);
-            }
-
-            DeliveryPartnerDb.remove(partnerId); //removing to Deliver Partner
+        DeliveryPartnerDb.remove(partnerId);
+        ArrayList<String> OrderList = PartnerToOrderPair.getOrDefault(partnerId,new ArrayList<>());
+        for(String Order: OrderList) {
+            OrderToPartnerPair.remove(Order);
         }
+        PartnerToOrderPair.remove(partnerId);
     }
 
 
     public void removeOrderIdFromDb(String orderId) {
-        if(OrdersDb.containsKey(orderId)) {
-
-            Order currOrder = OrdersDb.get(orderId);
-
-            if(currOrder.isDriverAssigned()) {
-                String partnerId = currOrder.getAssignedDeliveryPartner();
-
-                if(DeliveryPartnerDb.containsKey(partnerId)) {
-                    DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
-                    ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
-                    currOrderList.remove(orderId);
-                    currDelPartner.setAssignedOrdersList(currOrderList);
-                    DeliveryPartnerDb.put(partnerId, currDelPartner);
-                }
-            }
-
-            OrdersDb.remove(orderId);
+        OrdersDb.remove(orderId);
+        String partnerId =OrderToPartnerPair.get(orderId);
+        OrderToPartnerPair.remove(orderId);
+        ArrayList<String> OrderList =PartnerToOrderPair.get(partnerId);
+        for(String Order: OrderList) {
+            OrderList.remove(Order);
         }
+        PartnerToOrderPair.put(partnerId,OrderList);
     }
 
     public Integer getCountOfUnassignedOrdersFromDB() {
-        int UnassignedCount = 0;
-        for(Order currOrder : OrdersDb.values()) {
-            if(!currOrder.isDriverAssigned()) {
-                UnassignedCount++;
-            }
-        }
-        return UnassignedCount;
+        return OrdersDb.size()-OrderToPartnerPair.size();
+    }
+
+    public Integer getCountOfOrderByPartnerIdFromDB(String partnerId) {
+        return PartnerToOrderPair.get(partnerId).size();
+    }
+
+    public List<String> getListOfOrdersByPartnerIdFromDB(String partnerId) {
+        List<String> OrderList = new ArrayList<>();
+        OrderList = PartnerToOrderPair.get(partnerId);
+        return OrderList;
     }
 }

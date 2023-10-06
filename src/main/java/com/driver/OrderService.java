@@ -31,18 +31,15 @@ public class OrderService {
     }
 
     public Integer getCountOfOrderByPartnerId(String partnerId) {
-        if(getDelPartnerByPartnerId(partnerId)!=null) {
-            ArrayList<String> OrderListofPartnerId = getDelPartnerByPartnerId(partnerId).getAssignedOrdersList();
-            return OrderListofPartnerId.size();
-        }
-        return 0;
+        return repoLayer.getCountOfOrderByPartnerIdFromDB(partnerId);
     }
 
     public List<String> getListOfOrdersByPartnerId(String partnerId) {
-        if(getDelPartnerByPartnerId(partnerId)!=null) {
-            return getDelPartnerByPartnerId(partnerId).getAssignedOrdersList();
-        }
-        return null;
+        return repoLayer.getListOfOrdersByPartnerIdFromDB(partnerId);
+//        if(getDelPartnerByPartnerId(partnerId)!=null) {
+//            return getDelPartnerByPartnerId(partnerId).getAssignedOrdersList();
+//        }
+//        return null;
     }
 
     public List<String> getListOfAllOrders() {
@@ -51,15 +48,6 @@ public class OrderService {
 
     public Integer getCountOfUnassignedOrders() {
         return repoLayer.getCountOfUnassignedOrdersFromDB();
-//        List<String> allOrderList = getListOfAllOrders();
-//        int CountofUnassinged = 0;
-//
-//        for(String CurrOrder:allOrderList) {
-//            if(!getOrderByOrderId(CurrOrder).isDriverAssigned()) {
-//                CountofUnassinged++;
-//            }
-//        }
-//        return CountofUnassinged;
     }
 
     public Integer getCountOfUndeliveredOrders(String time, String partnerId) {
