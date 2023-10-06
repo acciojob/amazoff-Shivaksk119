@@ -103,4 +103,14 @@ public class OrderRepository {
             OrdersDb.remove(orderId);
         }
     }
+
+    public Integer getCountOfUnassignedOrdersFromDB() {
+        int UnassignedCount = 0;
+        for(Order currOrder : OrdersDb.values()) {
+            if(!currOrder.isDriverAssigned()) {
+                UnassignedCount++;
+            }
+        }
+        return UnassignedCount;
+    }
 }

@@ -50,15 +50,16 @@ public class OrderService {
     }
 
     public Integer getCountOfUnassignedOrders() {
-        List<String> allOrderList = getListOfAllOrders();
-        int CountofUnassinged = 0;
-
-        for(String CurrOrder:allOrderList) {
-            if(!getOrderByOrderId(CurrOrder).isDriverAssigned()) {
-                CountofUnassinged++;
-            }
-        }
-        return CountofUnassinged;
+        return repoLayer.getCountOfUnassignedOrdersFromDB();
+//        List<String> allOrderList = getListOfAllOrders();
+//        int CountofUnassinged = 0;
+//
+//        for(String CurrOrder:allOrderList) {
+//            if(!getOrderByOrderId(CurrOrder).isDriverAssigned()) {
+//                CountofUnassinged++;
+//            }
+//        }
+//        return CountofUnassinged;
     }
 
     public Integer getCountOfUndeliveredOrders(String time, String partnerId) {
