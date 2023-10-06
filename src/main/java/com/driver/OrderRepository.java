@@ -28,26 +28,24 @@ public class OrderRepository {
         if(OrdersDb.get(orderId).isDriverAssigned()) {
             return;
         }
-        if(DeliveryPartnerDb.containsKey(partnerId) && OrdersDb.containsKey(orderId)) {
+        //if(DeliveryPartnerDb.containsKey(partnerId) && OrdersDb.containsKey(orderId)) {
 
-            //adding order to Deliver Partner
-            DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
-            ArrayList<String> currOrderList = currDelPartner.getAssignedOrdersList();
-            currOrderList.add(orderId);
+        //adding order to Deliver Partner
+        DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
+        ArrayList<String> currOrderList = currDelPartner.getAssignedOrdersList();
+        currOrderList.add(orderId);
 
-            currDelPartner.setAssignedOrdersList(currOrderList);
-            currDelPartner.setOrderAssigned(true);
+        currDelPartner.setAssignedOrdersList(currOrderList);
+        currDelPartner.setOrderAssigned(true);
 
-            DeliveryPartnerDb.put(partnerId,currDelPartner);
+        DeliveryPartnerDb.put(partnerId,currDelPartner);
 
-            //adding partner to orderId
-            Order currOrder = OrdersDb.get(orderId);
+        //adding partner to orderId
+        Order currOrder = OrdersDb.get(orderId);
+        currOrder.setDriverAssigned(true);
+        currOrder.setAssignedDeliveryPartner(partnerId);
 
-            currOrder.setDriverAssigned(true);
-            currOrder.setAssignedDeliveryPartner(partnerId);
-
-            OrdersDb.put(orderId, currOrder);
-        }
+        OrdersDb.put(orderId, currOrder);
     }
 
     public Order getOrderFromDb(String orderId) {
