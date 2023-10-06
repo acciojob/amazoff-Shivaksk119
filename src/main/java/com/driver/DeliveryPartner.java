@@ -37,7 +37,7 @@ public class DeliveryPartner {
     }
 
     public void setOrderAssigned(boolean orderAssigned) {
-        isOrderAssigned = orderAssigned;
+        this.isOrderAssigned = orderAssigned;
     }
 
     public ArrayList<String> getAssignedOrdersList() {
@@ -45,6 +45,6 @@ public class DeliveryPartner {
     }
 
     public void setAssignedOrdersList(ArrayList<String> assignedOrdersList) {
-        AssignedOrdersList = assignedOrdersList;
+        this.AssignedOrdersList = assignedOrdersList;
     }
 }

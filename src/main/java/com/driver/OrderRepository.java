@@ -20,7 +20,8 @@ public class OrderRepository {
     }
 
     public void addDelvPartnerToDb(String partnerId) {
-        DeliveryPartnerDb.put(partnerId, new DeliveryPartner(partnerId));
+        DeliveryPartner newDeliveryPartner = new DeliveryPartner(partnerId);
+        DeliveryPartnerDb.put(partnerId, newDeliveryPartner);
     }
 
     public void addOrderToDelPartnerInDb(String orderId, String partnerId) {
@@ -29,25 +30,23 @@ public class OrderRepository {
         }
         if(DeliveryPartnerDb.containsKey(partnerId) && OrdersDb.containsKey(orderId)) {
 
-            //adding to Deliver Partner
-            ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
+            //adding order to Deliver Partner
+            DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
+            ArrayList<String> currOrderList = currDelPartner.getAssignedOrdersList();
             currOrderList.add(orderId);
 
-            DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
             currDelPartner.setAssignedOrdersList(currOrderList);
             currDelPartner.setOrderAssigned(true);
 
             DeliveryPartnerDb.put(partnerId,currDelPartner);
 
-            //adding to orderId
+            //adding partner to orderId
             Order currOrder = OrdersDb.get(orderId);
 
             currOrder.setDriverAssigned(true);
             currOrder.setAssignedDeliveryPartner(partnerId);
 
             OrdersDb.put(orderId, currOrder);
-
-
         }
     }
 
@@ -91,15 +90,18 @@ public class OrderRepository {
 
             Order currOrder = OrdersDb.get(orderId);
 
-            String partnerId = currOrder.getAssignedDeliveryPartner();
+            if(currOrder.isDriverAssigned()) {
+                String partnerId = currOrder.getAssignedDeliveryPartner();
 
-            if(DeliveryPartnerDb.containsKey(partnerId)) {
-                DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
-                ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
-                currOrderList.remove(orderId);
-                currDelPartner.setAssignedOrdersList(currOrderList);
-                DeliveryPartnerDb.put(partnerId, currDelPartner);
+                if(DeliveryPartnerDb.containsKey(partnerId)) {
+                    DeliveryPartner currDelPartner = DeliveryPartnerDb.get(partnerId);
+                    ArrayList<String> currOrderList = DeliveryPartnerDb.get(partnerId).getAssignedOrdersList();
+                    currOrderList.remove(orderId);
+                    currDelPartner.setAssignedOrdersList(currOrderList);
+                    DeliveryPartnerDb.put(partnerId, currDelPartner);
+                }
             }
+
             OrdersDb.remove(orderId);
         }
     }

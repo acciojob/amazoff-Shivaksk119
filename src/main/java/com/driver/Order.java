@@ -29,7 +29,7 @@ public class Order {
         return isDriverAssigned;
     }
     public void setDriverAssigned(boolean driverAssigned) {
-        isDriverAssigned = driverAssigned;
+        this.isDriverAssigned = driverAssigned;
     }
 
     public String getAssignedDeliveryPartner() {
